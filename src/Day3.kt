@@ -21,7 +21,7 @@ object Day3  {
     fun part2(input: List<String>): Long {
         var sum = 0L
         input.forEach {
-            sum += findBigVoltageForBank(it)
+            sum += outputJoltage(it, 12)
         }
         return sum
     }
@@ -52,32 +52,16 @@ object Day3  {
         return result.toInt()
     }
 
-    fun findBigVoltageForBank(bank: String): Long {
-        val indicies = mutableListOf<Int>()
-
-        for (i in 0..10) {
-            var highestValue = -1
-            var highestIndex = -1
-            bank.forEachIndexed { index, digit ->
-                val joltage = digit.digitToInt()
-                if (joltage >= highestValue && !indicies.contains(index)) {
-                    highestValue = joltage
-                    highestIndex = index
-                }
+    fun outputJoltage(bank: String, numDigits: Int): Long {
+        var checkableBank = bank
+        return buildString {
+            for (digit in (0 until numDigits)) {
+                // Find the largest battery that could be part of the result (front of the list).
+                val max = checkableBank.dropLast(numDigits - digit - 1).maxBy { it.digitToInt() }
+                append(max)
+                // Drop everything before (and including) this battery, and check for the next digit.
+                checkableBank = checkableBank.drop(checkableBank.indexOf(max) + 1)
             }
-            indicies.add(highestIndex)
-        }
-        indicies.sort()
-
-
-        var result = ""
-        indicies.forEach {
-            result += bank[it]
-        }
-        println(result)
-        return result.toLong()
+        }.toLong()
     }
-
-
-
 }
